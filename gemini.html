@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Certa - Viagens, Hospedagens e Experiências</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0066FF',   /* Azul Oceano */
+                        secondary: '#FF7A00', /* Laranja Pôr do Sol */
+                        neutral1: '#F8F9FA',
+                        neutral2: '#E9ECEF',
+                        neutral3: '#CED4DA',
+                        neutral4: '#6C757D',
+                        neutral5: '#212529',
+                        success: '#28A745',
+                        warning: '#FFC107',
+                        danger: '#DC3545',
+                        info: '#17A2B8'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F9FA; color: #212529; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #E9ECEF; }
+        ::-webkit-scrollbar-thumb { background: #CED4DA; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6C757D; }
+        
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Barra de pesquisa ajustada para remover o fundo preto dos inputs */
+        .header-search-pill {
+            border: 1px solid #CED4DA !important;
+            background: #FFFFFF !important;
+            box-shadow: none !important;
+            min-height: 76px !important;
+            min-width: 580px !important;
+            padding: 14px 18px 14px 24px !important;
+            gap: 18px !important;
+            font-weight: 400 !important;
+            text-decoration: none !important;
+            text-shadow: none !important;
+        }
+        .header-search-pill:hover,
+        .header-search-pill:focus-visible {
+            box-shadow: none !important;
+            border-color: #CED4DA !important;
+            outline: none;
+        }
+        .header-search-pill .search-pill-label,
+        .header-search-pill .search-pill-hint {
+            display: inline-block;
+            background: transparent !important;
+            background-color: transparent !important;
+            color: #495057 !important;
+            font-size: 18px !important;
+            font-weight: 400 !important;
+            text-decoration: none !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            white-space: nowrap;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .header-search-pill .search-pill-icon {
+            width: 44px !important;
+            height: 44px !important;
+            background: #FF7A00 !important;
+            box-shadow: none !important;
+            flex-shrink: 0;
+        }
+        .header-search-pill .search-pill-icon svg { width: 22px; height: 22px; stroke-width: 2; }
+        @media (max-width: 1100px) {
+            .header-search-pill { min-width: 460px !important; gap: 12px !important; padding-left: 16px !important; }
+            .header-search-pill .search-pill-label,
+            .header-search-pill .search-pill-hint { font-size: 15px !important; }
+        }
+        .header-planner-button {
+            background: #0066FF !important;
+            color: #FFFFFF !important;
+            border: 2px solid #0066FF !important;
+            padding: 12px 16px !important;
+            font-size: 13px !important;
+            gap: 8px !important;
+            box-shadow: 0 3px 10px rgba(0, 102, 255, 0.2);
+        }
+        .header-planner-button:hover,
+        .header-planner-button:focus-visible {
+            background: #004FC4 !important;
+            border-color: #004FC4 !important;
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.16);
+            outline: none;
+        }
+        .header-planner-button svg { width: 19px; height: 19px; color: #FFFFFF !important; stroke-width: 2.5; }
+        #advanced-query {
+            background: #FFFFFF !important;
+            border: 1px solid #CED4DA !important;
+            padding: 15px 16px !important;
+            min-height: 54px;
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            box-shadow: none !important;
+        }
+        #advanced-query:focus {
+            border-color: #CED4DA !important;
+            box-shadow: none !important;
+            outline: none;
+        }
+        #advanced-query::placeholder { color: #6C757D; opacity: 1; font-weight: 400; }
+        
+        /* Correção específica para remover fundo escuro/preto dos inputs da Hero e modais */
+        input[type="text"], input[type="date"], input[type="time"], input[type="number"], input[type="password"], input[type="email"], select {
+            background-color: transparent !important;
+        }
+        .bg-white input[type="text"], .bg-white input[type="date"], .bg-white input[type="time"], .bg-white input[type="number"], .bg-white select {
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#F8F9FA] text-[#212529] relative"[cite: 2]>
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"[cite: 2]></div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-[#CED4DA] sticky top-0 z-40 shadow-sm"[cite: 2]>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between"[cite: 2]>
+            
+            <!-- Logo -->
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('explore')"[cite: 2]>
+                <div class="w-10 h-10 flex items-center justify-center"[cite: 2]>
+                    <svg class="w-full h-full drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"[cite: 2]>
+                        <circle cx="50" cy="50" r="42" stroke="#0066FF" stroke-width="7" fill="white"[cite: 2]/>
+                        <circle cx="50" cy="50" r="34" stroke="#CED4DA" stroke-dasharray="3 3" stroke-width="2"[cite: 2]/>
+                        <polygon points="50,18 56,50 50,44" fill="#FF7A00"[cite: 2]/>
+                        <polygon points="50,82 56,50 50,44" fill="#6C757D"[cite: 2]/>
+                        <polygon points="50,18 44,50 50,44" fill="#FF7A00" opacity="0.8"[cite: 2]/>
+                        <polygon points="50,82 44,50 50,44" fill="#212529"[cite: 2]/>
+                        <path d="M 22 75 Q 45 20 80 25" stroke="#FF7A00" stroke-width="4" stroke-linecap="round" fill="none"[cite: 2]/>
+                        <g transform="translate(72, 18) rotate(35)"[cite: 2]>
+                            <path d="M12 2L2 9l4 2 2 7 3-3 4 3 2-15z" fill="#0066FF"[cite: 2]/>
+                        </g>
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg text-[#0066FF] tracking-tight flex items-center gap-1"[cite: 2]>
+                        Rota Certa <span class="bg-[#0066FF]/10 text-[#0066FF] text-[10px] font-black px-1.5 py-0.5 rounded uppercase"[cite: 2]>Travel</span>
+                    </span>
+                    <span class="text-[10px] text-[#6C757D] block font-medium"[cite: 2]>Hospedagens, Pacotes & Planner</span>
+                </div>
+            </div>
+
+            <!-- Search Bar Mini Pill (Desktop) -->
+            <div role="button" tabindex="0" aria-label="Abrir pesquisa de viagens" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchView('search')}" onclick="switchView('search')" class="header-search-pill hidden md:flex items-center border rounded-full transition cursor-pointer text-sm"[cite: 3]>
+                <span class="search-pill-label px-2"[cite: 3]>Para onde?</span>
+                <span class="search-pill-label px-2"[cite: 3]>Quando?</span>
+                <span class="search-pill-hint px-2"[cite: 3]>Pesquisar viagens</span>
+                <div class="search-pill-icon w-8 h-8 bg-[#FF7A00] text-white rounded-full flex items-center justify-center shadow"[cite: 3]>
+                    <i data-lucide="search" class="w-4 h-4"[cite: 2]></i>
+                </div>
+            </div>
+
+            <!-- Right Navigation / User Menu -->
+            <div class="flex items-center space-x-3"[cite: 2]>
+                <button aria-label="Abrir Meu Planner" onclick="switchView('planner')" class="header-planner-button hidden sm:flex items-center rounded-full transition"[cite: 3]>
+                    <i data-lucide="calendar-check" class="w-4 h-4 text-[#0066FF]"[cite: 2]></i> Meu Planner
+                </button>
+                
+                <div class="relative group"[cite: 2]>
+                    <button onclick="toggleUserDropdown()" class="flex items-center space-x-3 border border-[#CED4DA] rounded-full py-1.5 px-3 hover:shadow-md transition bg-white"[cite: 2]>
+                        <i data-lucide="menu" class="w-4 h-4 text-[#6C757D]"[cite: 2]></i>
+                        <div id="header-user-avatar" class="w-8 h-8 rounded-full bg-[#0066FF] text-white flex items-center justify-center font-bold text-xs shadow"[cite: 2]>
+                            LS
+                        </div>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-[#CED4DA] py-2 z-50"[cite: 2]>
+                        <button onclick="switchView('planner'); toggleUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-[#F8F9FA] flex items-center gap-2 sm:hidden"[cite: 2]>
+                            <i data-lucide="calendar-check" class="w-4 h-4 text-[#0066FF]"[cite: 2]></i> Meu Planner
+                        </button>
+                        <button onclick="switchView('profile'); toggleUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-[#F8F9FA] flex items-center gap-2"[cite: 2]>
+                            <i data-lucide="user" class="w-4 h-4 text-[#0066FF]"[cite: 2]></i> Meu Perfil
+                        </button>
+                        <button onclick="switchView('my-trips'); toggleUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-[#F8F9FA] flex items-center gap-2"[cite: 2]>
+                            <i data-lucide="briefcase" class="w-4 h-4 text-[#FF7A00]"[cite: 2]></i> Minhas Reservas & Viagens
+                        </button>
+                        <button onclick="openModal('modal-host'); toggleUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs hover:bg-[#F8F9FA] flex items-center gap-2"[cite: 2]>
+                            <i data-lucide="home" class="w-4 h-4 text-[#212529]"[cite: 2]></i> Anuncie seu Espaço
+                        </button>
+                        <div class="border-t border-[#CED4DA] my-1"[cite: 2]></div>
+                        <button onclick="openModal('modal-auth'); toggleUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-[#0066FF] font-bold hover:bg-[#F8F9FA] flex items-center gap-2"[cite: 2]>
+                            <i data-lucide="log-in" class="w-4 h-4"[cite: 2]></i> Entrar / Cadastrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIES FILTER BAR -->
+        <div class="border-t border-[#CED4DA] bg-white py-3 shadow-sm"[cite: 2]>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center space-x-8 overflow-x-auto hide-scrollbar"[cite: 2]>
+                <button onclick="switchView('search')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#0066FF] border-b-2 border-[#0066FF] pb-2 font-semibold text-xs transition"[cite: 2]>
+                    <i data-lucide="search" class="w-5 h-5"[cite: 2]></i> Tela de Pesquisa Avançada
+                </button>
+                <button onclick="filterCategory('all')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="compass" class="w-5 h-5"[cite: 2]></i> Todos
+                </button>
+                <button onclick="filterCategory('hospedagem')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="home" class="w-5 h-5"[cite: 2]></i> Hospedagens
+                </button>
+                <button onclick="filterCategory('pacote')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="plane" class="w-5 h-5"[cite: 2]></i> Pacotes CVC (Aéreo + Hotel)
+                </button>
+                <button onclick="filterCategory('passeio')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="ticket" class="w-5 h-5"[cite: 2]></i> Passeios & Ingressos
+                </button>
+                <button onclick="filterCategory('resort')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="palmtree" class="w-5 h-5"[cite: 2]></i> Resorts All Inclusive
+                </button>
+                <button onclick="filterCategory('europa')" class="category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition"[cite: 2]>
+                    <i data-lucide="landmark" class="w-5 h-5"[cite: 2]></i> Europa Tour
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"[cite: 2]>
+
+        <!-- VIEW 1: EXPLORE / MARKETPLACE (Airbnb + CVC) -->
+        <div id="view-explore" class="space-y-8"[cite: 2]>
+            
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0066FF] via-[#17A2B8] to-[#FF7A00] p-8 sm:p-12 text-white shadow-xl"[cite: 2]>
+                <div class="relative z-10 max-w-2xl"[cite: 2]>
+                    <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider"[cite: 2]>Oferta Imperdível Verão</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold mt-3 mb-3"[cite: 2]>Sua Próxima Viagem Começa Aqui.</h1>
+                    <p class="text-white/90 text-sm sm:text-base mb-6"[cite: 2]>Compare preços de hotéis, pacotes completos de agência e adicione tudo ao seu Planner inteligente com divisão de gastos em grupo.</p>
+                    
+                    <div class="bg-white p-2 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2"[cite: 2]>
+                        <div class="flex-1 px-4 py-2 border-b sm:border-b-0 sm:border-r border-[#CED4DA]"[cite: 2]>
+                            <label class="block text-[10px] font-black uppercase text-[#6C757D]"[cite: 2]>Destino</label>
+                            <input type="text" id="search-destination" placeholder="Para onde você vai?" class="w-full text-xs font-bold text-[#212529] bg-transparent focus:outline-none"[cite: 2]>
+                        </div>
+                        <div class="flex-1 px-4 py-2"[cite: 2]>
+                            <label class="block text-[10px] font-black uppercase text-[#6C757D]"[cite: 2]>Datas</label>
+                            <input type="date" id="search-date" class="w-full text-xs font-bold text-[#212529] bg-transparent focus:outline-none"[cite: 2]>
+                        </div>
+                        <button onclick="performSearch()" class="bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-md"[cite: 2]>
+                            <i data-lucide="search" class="w-4 h-4"[cite: 2]></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listings Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-6"[cite: 2]>
+                    <h2 class="text-xl font-extrabold text-[#212529]"[cite: 2]>Estadias e Pacotes em Destaque</h2>
+                    <div class="flex gap-2"[cite: 2]>
+                        <button onclick="switchView('search')" class="text-xs font-bold text-[#0066FF] bg-[#0066FF]/10 px-3 py-1.5 rounded-xl hover:bg-[#0066FF]/20 transition flex items-center gap-1"[cite: 2]>
+                            <i data-lucide="sliders" class="w-3.5 h-3.5"[cite: 2]></i> Filtros Avançados
+                        </button>
+                        <span id="listings-count" class="text-xs text-[#6C757D] self-center"[cite: 2]>Mostrando opções incríveis</span>
+                    </div>
+                </div>
+
+                <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"[cite: 2]>
+                    <!-- Dynamic cards injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW NEW: SEARCH SCREEN (Tela de Pesquisa Avançada) -->
+        <div id="view-search" class="hidden space-y-6"[cite: 2]>
+            <div class="flex items-center justify-between"[cite: 2]>
+                <button onclick="switchView('explore')" class="inline-flex items-center gap-2 text-xs font-bold text-[#212529] hover:bg-[#E9ECEF] px-4 py-2 rounded-xl transition border border-[#CED4DA]"[cite: 2]>
+                    <i data-lucide="arrow-left" class="w-4 h-4"[cite: 2]></i> Voltar ao Início
+                </button>
+                <h2 class="text-xl font-extrabold text-[#212529]"[cite: 2]>Pesquisa Avançada de Viagens & Hotéis</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6"[cite: 2]>
+                <!-- Sidebar Filters -->
+                <div class="bg-white p-6 rounded-3xl border border-[#CED4DA] shadow-sm space-y-6 h-fit"[cite: 2]>
+                    <h3 class="font-bold text-sm text-[#212529] pb-3 border-b border-[#CED4DA] flex items-center justify-between"[cite: 2]>
+                        <span>Filtros</span>
+                        <button onclick="resetSearchFilters()" class="text-[10px] text-[#0066FF] hover:underline"[cite: 2]>Limpar</button>
+                    </h3>
+
+                    <!-- Destination Input -->
+                    <div class="space-y-2"[cite: 2]>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase"[cite: 2]>Destino ou Cidade</label>
+                        <input type="text" id="advanced-query" oninput="triggerAdvancedSearch()" placeholder="Ex: Paris, Barcelona, Búzios..." class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                    </div>
+
+                    <!-- Category Selector -->
+                    <div class="space-y-2"[cite: 2]>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase"[cite: 2]>Categoria</label>
+                        <select id="advanced-category" onchange="triggerAdvancedSearch()" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                            <option value="all"[cite: 2]>Todas as Categorias</option>
+                            <option value="hospedagem"[cite: 2]>Hospedagens (Airbnb)</option>
+                            <option value="pacote"[cite: 2]>Pacotes CVC (Aéreo + Hotel)</option>
+                            <option value="resort"[cite: 2]>Resorts All Inclusive</option>
+                            <option value="passeio"[cite: 2]>Passeios e Ingressos</option>
+                            <option value="europa"[cite: 2]>Europa Tour</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range Slider -->
+                    <div class="space-y-2"[cite: 2]>
+                        <div class="flex justify-between items-center text-xs"[cite: 2]>
+                            <span class="font-bold text-[#6C757D] uppercase"[cite: 2]>Preço Máximo</span>
+                            <span id="price-val-label" class="font-extrabold text-[#0066FF]"[cite: 2]>R$ 10.000</span>
+                        </div>
+                        <input type="range" id="advanced-price" min="200" max="10000" step="100" value="10000" oninput="triggerAdvancedSearch()" class="w-full accent-[#0066FF] cursor-pointer"[cite: 2]>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="space-y-2"[cite: 2]>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase"[cite: 2]>Ordenar Por</label>
+                        <select id="advanced-sort" onchange="triggerAdvancedSearch()" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                            <option value="recommended"[cite: 2]>Recomendados</option>
+                            <option value="price-asc"[cite: 2]>Menor Preço</option>
+                            <option value="price-desc"[cite: 2]>Maior Preço</option>
+                            <option value="rating"[cite: 2]>Melhor Avaliação ⭐</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="lg:col-span-3 space-y-4"[cite: 2]>
+                    <div class="bg-white p-4 rounded-2xl border border-[#CED4DA] flex items-center justify-between shadow-sm"[cite: 2]>
+                        <span id="search-results-count" class="text-xs font-bold text-[#212529]"[cite: 2]>Exibindo 6 opções correspondentes</span>
+                        <span class="text-xs text-[#6C757D]"[cite: 2]>Atualizado em tempo real</span>
+                    </div>
+
+                    <div id="advanced-search-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"[cite: 2]>
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: PROPERTY / ITEM DETAILS -->
+        <div id="view-details" class="hidden space-y-6"[cite: 2]>
+            <button onclick="switchView('explore')" class="inline-flex items-center gap-2 text-xs font-bold text-[#212529] hover:bg-[#E9ECEF] px-4 py-2 rounded-xl transition border border-[#CED4DA]"[cite: 2]>
+                <i data-lucide="arrow-left" class="w-4 h-4"[cite: 2]></i> Voltar para a busca
+            </button>
+
+            <div id="details-content" class="space-y-6"[cite: 2]>
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW 3: ROTA CERTA PLANNER -->
+        <div id="view-planner" class="hidden space-y-8"[cite: 2]>
+            <div class="bg-gradient-to-r from-[#0066FF] via-[#17A2B8] to-[#FF7A00] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"[cite: 2]>
+                <div class="relative z-10 max-w-2xl"[cite: 2]>
+                    <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider"[cite: 2]>Planner Inteligente Integrado</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold mt-3 mb-2"[cite: 2]>Seu Roteiro & Orçamento ✈️</h2>
+                    <p class="text-white/90 text-sm sm:text-base mb-6"[cite: 2]>Organize passeios, controle gastos e divida contas com amigos em tempo real.</p>
+                    
+                    <div class="flex flex-wrap gap-3"[cite: 2]>
+                        <button onclick="openModal('modal-add-expense-general')" class="bg-white text-[#0066FF] hover:bg-[#F8F9FA] font-bold px-5 py-3 rounded-xl shadow-lg transition flex items-center gap-2 text-sm"[cite: 2]>
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-[#FF7A00]"[cite: 2]></i> Adicionar Gasto
+                        </button>
+                        <button onclick="openModal('modal-add-itinerary')" class="bg-[#212529] text-white hover:bg-black font-bold px-5 py-3 rounded-xl shadow-lg transition flex items-center gap-2 text-sm"[cite: 2]>
+                            <i data-lucide="map-pin" class="w-4 h-4 text-[#FF7A00]"[cite: 2]></i> Novo Evento no Roteiro
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planner Tabs -->
+            <div class="flex border-b border-[#CED4DA] space-x-6 overflow-x-auto"[cite: 2]>
+                <button onclick="switchPlannerTab('overview')" id="pnav-overview" class="planner-nav pb-3 text-sm font-bold border-b-2 border-[#0066FF] text-[#0066FF] whitespace-nowrap"[cite: 2]>Visão Geral</button>
+                <button onclick="switchPlannerTab('itinerary')" id="pnav-itinerary" class="planner-nav pb-3 text-sm font-medium text-[#6C757D] hover:text-[#212529] whitespace-nowrap"[cite: 2]>Roteiro Diário</button>
+                <button onclick="switchPlannerTab('expenses')" id="pnav-expenses" class="planner-nav pb-3 text-sm font-medium text-[#6C757D] hover:text-[#212529] whitespace-nowrap"[cite: 2]>Controle de Gastos</button>
+                <button onclick="switchPlannerTab('groups')" id="pnav-groups" class="planner-nav pb-3 text-sm font-medium text-[#6C757D] hover:text-[#212529] whitespace-nowrap"[cite: 2]>Grupo & Divisão</button>
+            </div>
+
+            <!-- Planner Tab 1: Overview -->
+            <div id="ptab-overview" class="planner-content space-y-6"[cite: 2]>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"[cite: 2]>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm flex items-center justify-between"[cite: 2]>
+                        <div>
+                            <p class="text-xs font-medium text-[#6C757D]"[cite: 2]>Orçamento Definido</p>
+                            <h3 class="text-xl font-extrabold text-[#212529] mt-1"[cite: 2]>R$ 15.000,00</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#0066FF]/10 text-[#0066FF] flex items-center justify-center"[cite: 2]>
+                            <i data-lucide="piggy-bank" class="w-6 h-6"[cite: 2]></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm flex items-center justify-between"[cite: 2]>
+                        <div>
+                            <p class="text-xs font-medium text-[#6C757D]"[cite: 2]>Gastos Totais</p>
+                            <h3 id="planner-stat-expenses" class="text-xl font-extrabold text-[#212529] mt-1"[cite: 2]>R$ 0,00</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#FF7A00]/10 text-[#FF7A00] flex items-center justify-center"[cite: 2]>
+                            <i data-lucide="credit-card" class="w-6 h-6"[cite: 2]></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm flex items-center justify-between"[cite: 2]>
+                        <div>
+                            <p class="text-xs font-medium text-[#6C757D]"[cite: 2]>Atividades</p>
+                            <h3 id="planner-stat-activities" class="text-xl font-extrabold text-[#212529] mt-1"[cite: 2]>0 Item</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#17A2B8]/10 text-[#17A2B8] flex items-center justify-center"[cite: 2]>
+                            <i data-lucide="calendar" class="w-6 h-6"[cite: 2]></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm flex items-center justify-between"[cite: 2]>
+                        <div>
+                            <p class="text-xs font-medium text-[#6C757D]"[cite: 2]>Membros</p>
+                            <h3 id="planner-stat-members" class="text-xl font-extrabold text-[#212529] mt-1"[cite: 2]>0 Membros</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#28A745]/10 text-[#28A745] flex items-center justify-center"[cite: 2]>
+                            <i data-lucide="users" class="w-6 h-6"[cite: 2]></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planner Tab 2: Itinerary -->
+            <div id="ptab-itinerary" class="planner-content hidden space-y-6"[cite: 2]>
+                <div class="flex items-center justify-between"[cite: 2]>
+                    <div class="flex space-x-2 overflow-x-auto pb-2"[cite: 2]>
+                        <button onclick="filterItineraryDay(1)" id="day-btn-1" class="day-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0066FF] text-white whitespace-nowrap shadow-sm"[cite: 2]>Dia 1</button>
+                        <button onclick="filterItineraryDay(2)" id="day-btn-2" class="day-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#E9ECEF] text-[#6C757D] border border-[#CED4DA] whitespace-nowrap"[cite: 2]>Dia 2</button>
+                        <button onclick="filterItineraryDay(3)" id="day-btn-3" class="day-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#E9ECEF] text-[#6C757D] border border-[#CED4DA] whitespace-nowrap"[cite: 2]>Dia 3</button>
+                    </div>
+                    <button onclick="openModal('modal-add-itinerary')" class="bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center gap-1.5"[cite: 2]>
+                        <i data-lucide="plus" class="w-4 h-4"[cite: 2]></i> Adicionar ao Roteiro
+                    </button>
+                </div>
+                <div id="itinerary-container" class="space-y-4"[cite: 2]></div>
+            </div>
+
+            <!-- Planner Tab 3: Expenses -->
+            <div id="ptab-expenses" class="planner-content hidden space-y-6"[cite: 2]>
+                <div class="flex justify-end"[cite: 2]>
+                    <button onclick="openModal('modal-add-expense-general')" class="bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center gap-1.5"[cite: 2]>
+                        <i data-lucide="plus" class="w-4 h-4"[cite: 2]></i> Adicionar Gasto
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl border border-[#CED4DA] shadow-sm overflow-hidden"[cite: 2]>
+                    <div class="p-4 sm:p-5 border-b border-[#CED4DA] flex items-center justify-between"[cite: 2]>
+                        <h3 class="font-bold text-base text-[#212529]"[cite: 2]>Lançamentos do Planner</h3>
+                        <span class="text-xs text-[#6C757D]" id="expenses-count-badge"[cite: 2]>0 registros</span>
+                    </div>
+                    <div class="divide-y divide-[#CED4DA]" id="expenses-list-container"[cite: 2]></div>
+                </div>
+            </div>
+
+            <!-- Planner Tab 4: Groups -->
+            <div id="ptab-groups" class="planner-content hidden space-y-6"[cite: 2]>
+                <div class="flex justify-end"[cite: 2]>
+                    <button onclick="openModal('modal-add-group-split')" class="bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center gap-1.5"[cite: 2]>
+                        <i data-lucide="plus" class="w-4 h-4"[cite: 2]></i> Nova Divisão de Gasto / Grupo
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"[cite: 2]>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm space-y-4"[cite: 2]>
+                        <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                            <h3 class="font-bold text-sm text-[#212529]"[cite: 2]>Membros do Grupo</h3>
+                            <button onclick="openModal('modal-add-member')" class="text-xs text-[#0066FF] font-bold"[cite: 2]>+ Adicionar</button>
+                        </div>
+                        <div id="members-list-container" class="space-y-3"[cite: 2]></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] shadow-sm space-y-4"[cite: 2]>
+                        <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                            <h3 class="font-bold text-sm text-[#212529]"[cite: 2]>Balanço e Acerto de Contas</h3>
+                        </div>
+                        <div id="splits-list-container" class="space-y-3"[cite: 2]></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: MINHAS RESERVAS & VIAGENS -->
+        <div id="view-my-trips" class="hidden space-y-6"[cite: 2]>
+            <h2 class="text-2xl font-extrabold text-[#212529]"[cite: 2]>Minhas Reservas & Pacotes Comprados</h2>
+            <div id="my-trips-container" class="space-y-4"[cite: 2]>
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW 5: USER PROFILE -->
+        <div id="view-profile" class="hidden space-y-8"[cite: 2]>
+            <div class="bg-white rounded-3xl border border-[#CED4DA] shadow-xl overflow-hidden"[cite: 2]>
+                <!-- Profile Banner Header -->
+                <div class="h-44 bg-gradient-to-r from-[#0066FF] via-[#17A2B8] to-[#FF7A00] relative p-6 flex items-end"[cite: 2]>
+                    <button onclick="openModal('modal-edit-profile')" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2 rounded-xl text-xs backdrop-blur-md transition flex items-center gap-1.5"[cite: 2]>
+                        <i data-lucide="edit-3" class="w-4 h-4"[cite: 2]></i> Editar Perfil
+                    </button>
+                </div>
+                
+                <!-- Profile Content -->
+                <div class="px-6 sm:px-8 pb-8 relative"[cite: 2]>
+                    <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 mb-6 gap-4"[cite: 2]>
+                        <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left"[cite: 2]>
+                            <div class="w-28 h-28 rounded-full border-4 border-white bg-[#0066FF] text-white flex items-center justify-center text-3xl font-black shadow-lg" id="profile-avatar-box"[cite: 2]>
+                                LS
+                            </div>
+                            <div class="mt-2 sm:mt-12"[cite: 2]>
+                                <h2 id="profile-display-name" class="text-2xl font-extrabold text-[#212529]"[cite: 2]>Lucas Silva</h2>
+                                <p id="profile-display-email" class="text-xs text-[#6C757D]"[cite: 2]>lucas.silva@rotacerta.com.br • São Paulo, SP</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2"[cite: 2]>
+                            <button onclick="switchView('planner')" class="bg-[#0066FF] hover:bg-[#0052cc] text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center gap-1.5"[cite: 2]>
+                                <i data-lucide="calendar" class="w-4 h-4"[cite: 2]></i> Ver Meu Planner
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Stats -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"[cite: 2]>
+                        <div class="bg-[#F8F9FA] p-4 rounded-2xl border border-[#CED4DA] text-center"[cite: 2]>
+                            <span class="text-xs text-[#6C757D] font-medium"[cite: 2]>Viagens Planejadas</span>
+                            <h3 class="text-xl font-extrabold text-[#212529] mt-1" id="stat-trips-count"[cite: 2]>3</h3>
+                        </div>
+                        <div class="bg-[#F8F9FA] p-4 rounded-2xl border border-[#CED4DA] text-center"[cite: 2]>
+                            <span class="text-xs text-[#6C757D] font-medium"[cite: 2]>Destinos Favoritos</span>
+                            <h3 class="text-xl font-extrabold text-[#212529] mt-1"[cite: 2]>Barcelona, Paris</h3>
+                        </div>
+                        <div class="bg-[#F8F9FA] p-4 rounded-2xl border border-[#CED4DA] text-center"[cite: 2]>
+                            <span class="text-xs text-[#6C757D] font-medium"[cite: 2]>Membros no Grupo</span>
+                            <h3 class="text-xl font-extrabold text-[#212529] mt-1" id="stat-members-count"[cite: 2]>2</h3>
+                        </div>
+                    </div>
+
+                    <!-- Profile Bio & Details -->
+                    <div class="border-t border-[#CED4DA] pt-6 grid grid-cols-1 md:grid-cols-2 gap-6"[cite: 2]>
+                        <div class="space-y-4"[cite: 2]>
+                            <h3 class="font-bold text-sm text-[#212529]"[cite: 2]>Informações Pessoais</h3>
+                            <div class="space-y-3 text-xs"[cite: 2]>
+                                <div class="flex justify-between py-2 border-b border-[#CED4DA]"[cite: 2]>
+                                    <span class="text-[#6C757D]"[cite: 2]>Telefone:</span>
+                                    <span class="font-bold text-[#212529]" id="profile-display-phone"[cite: 2]>+55 (11) 98888-7777</span>
+                                </div>
+                                <div class="flex justify-between py-2 border-b border-[#CED4DA]"[cite: 2]>
+                                    <span class="text-[#6C757D]"[cite: 2]>Tipo de Conta:</span>
+                                    <span class="font-bold text-[#0066FF]"[cite: 2]>Viajante & Membro Rota Certa</span>
+                                </div>
+                                <div class="flex justify-between py-2 border-b border-[#CED4DA]"[cite: 2]>
+                                    <span class="text-[#6C757D]"[cite: 2]>Moeda Preferida:</span>
+                                    <span class="font-bold text-[#212529]"[cite: 2]>Real Brasileiro (BRL R$)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4"[cite: 2]>
+                            <h3 class="font-bold text-sm text-[#212529]"[cite: 2]>Preferências de Viagem</h3>
+                            <div class="flex flex-wrap gap-2 pt-2"[cite: 2]>
+                                <span class="bg-[#E9ECEF] text-[#212529] px-3 py-1.5 rounded-xl text-xs font-semibold"[cite: 2]>✈️ Voos Internacionais</span>
+                                <span class="bg-[#E9ECEF] text-[#212529] px-3 py-1.5 rounded-xl text-xs font-semibold"[cite: 2]>🏨 Hotéis 4 e 5 Estrelas</span>
+                                <span class="bg-[#E9ECEF] text-[#212529] px-3 py-1.5 rounded-xl text-xs font-semibold"[cite: 2]>🏖️ Resorts All Inclusive</span>
+                                <span class="bg-[#E9ECEF] text-[#212529] px-3 py-1.5 rounded-xl text-xs font-semibold"[cite: 2]>🗺️ City Tours Culturais</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    
+    <!-- MODAL: RESERVATION / CHECKOUT -->
+    <div id="modal-checkout" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-[#CED4DA] space-y-6 relative max-h-[90vh] overflow-y-auto"[cite: 2]>
+            <div class="flex items-center justify-between pb-4 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-xl text-[#212529]"[cite: 2]>Confirmar Reserva</h3>
+                <button onclick="closeModal('modal-checkout')" class="text-[#6C757D] hover:text-[#212529] p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            <div id="checkout-item-details" class="space-y-4"[cite: 2]></div>
+            <form onsubmit="submitReservation(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Nome do Titular</label>
+                    <input type="text" id="checkout-name" required value="Lucas Silva" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <div class="grid grid-cols-2 gap-3"[cite: 2]>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Check-in</label>
+                        <input type="date" id="checkout-date-in" required class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-3 text-sm font-semibold text-[#212529] focus:outline-none"[cite: 2]>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Check-out</label>
+                        <input type="date" id="checkout-date-out" required class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-3 text-sm font-semibold text-[#212529] focus:outline-none"[cite: 2]>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm"[cite: 2]>
+                    Confirmar e Pagar Agora 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: AUTH / LOGIN & SIGNUP -->
+    <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-[#CED4DA] space-y-6 relative"[cite: 2]>
+            <div class="flex items-center justify-between pb-4 border-b border-[#CED4DA]"[cite: 2]>
+                <div class="flex items-center gap-2"[cite: 2]>
+                    <div class="w-8 h-8 rounded-full bg-[#0066FF] text-white flex items-center justify-center font-bold text-xs"[cite: 2]>RC</div>
+                    <h3 class="font-bold text-lg text-[#212529]"[cite: 2]>Entrar na Rota Certa</h3>
+                </div>
+                <button onclick="closeModal('modal-auth')" class="text-[#6C757D] hover:text-[#212529] p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            
+            <form onsubmit="handleAuthLogin(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>E-mail</label>
+                    <input type="email" id="auth-email" required value="lucas.silva@rotacerta.com.br" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Senha</label>
+                    <input type="password" id="auth-password" required value="********" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <button type="submit" class="w-full bg-[#0066FF] hover:bg-[#0052cc] text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm"[cite: 2]>
+                    Entrar na Conta
+                </button>
+            </form>
+            <div class="text-center pt-2"[cite: 2]>
+                <span class="text-xs text-[#6C757D]"[cite: 2]>Não tem uma conta? <a href="#" onclick="showToast('Modo demonstração ativo: use os dados acima!', 'info');" class="text-[#0066FF] font-bold hover:underline"[cite: 2]>Cadastre-se grátis</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT PROFILE -->
+    <div id="modal-edit-profile" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-[#CED4DA] space-y-6 relative"[cite: 2]>
+            <div class="flex items-center justify-between pb-4 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-lg text-[#212529]"[cite: 2]>Editar Perfil</h3>
+                <button onclick="closeModal('modal-edit-profile')" class="text-[#6C757D] hover:text-[#212529] p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            
+            <form onsubmit="submitEditProfile(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Nome Completo</label>
+                    <input type="text" id="edit-name" required value="Lucas Silva" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>E-mail</label>
+                    <input type="email" id="edit-email" required value="lucas.silva@rotacerta.com.br" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Telefone</label>
+                    <input type="text" id="edit-phone" required value="+55 (11) 98888-7777" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-3 text-sm font-semibold text-[#212529] focus:outline-none focus:border-[#0066FF]"[cite: 2]>
+                </div>
+                <button type="submit" class="w-full bg-[#0066FF] hover:bg-[#0052cc] text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm"[cite: 2]>
+                    Salvar Alterações
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD EXPENSE -->
+    <div id="modal-add-expense-general" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4"[cite: 2]>
+            <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-lg text-[#212529]"[cite: 2]>Adicionar Gasto no Planner</h3>
+                <button onclick="closeModal('modal-add-expense-general')" class="p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            <form onsubmit="submitExpense(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Descrição</label>
+                    <input type="text" id="exp-title" required placeholder="Ex: Aluguel de Carro" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                </div>
+                <div class="grid grid-cols-2 gap-3"[cite: 2]>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Valor (R$)</label>
+                        <input type="number" id="exp-amount" step="0.01" required placeholder="0.00" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Categoria</label>
+                        <select id="exp-cat" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-sm"[cite: 2]>
+                            <option value="Hospedagem"[cite: 2]>Hospedagem</option>
+                            <option value="Alimentação"[cite: 2]>Alimentação</option>
+                            <option value="Transporte"[cite: 2]>Transporte</option>
+                            <option value="Lazer"[cite: 2]>Lazer</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#FF7A00] text-white font-bold py-3 rounded-xl text-sm shadow"[cite: 2]>Salvar Gasto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD ITINERARY -->
+    <div id="modal-add-itinerary" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4"[cite: 2]>
+            <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-lg text-[#212529]"[cite: 2]>Adicionar Atividade no Roteiro</h3>
+                <button onclick="closeModal('modal-add-itinerary')" class="p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            <form onsubmit="submitItinerary(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Título</label>
+                    <input type="text" id="it-title" required placeholder="Ex: Passeio de Barco" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                </div>
+                <div class="grid grid-cols-2 gap-3"[cite: 2]>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Dia</label>
+                        <select id="it-day" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-sm"[cite: 2]>
+                            <option value="1"[cite: 2]>Dia 1</option>
+                            <option value="2"[cite: 2]>Dia 2</option>
+                            <option value="3"[cite: 2]>Dia 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Horário</label>
+                        <input type="time" id="it-time" required class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-sm"[cite: 2]>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Local / Custo</label>
+                    <input type="text" id="it-loc" required placeholder="Local" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm mb-2"[cite: 2]>
+                    <input type="number" id="it-cost" step="0.01" placeholder="Custo R$" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                </div>
+                <button type="submit" class="w-full bg-[#FF7A00] text-white font-bold py-3 rounded-xl text-sm shadow"[cite: 2]>Adicionar Atividade</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD MEMBER -->
+    <div id="modal-add-member" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4"[cite: 2]>
+            <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-sm text-[#212529]"[cite: 2]>Adicionar Amigo ao Grupo</h3>
+                <button onclick="closeModal('modal-add-member')" class="p-1"[cite: 2]><i data-lucide="x" class="w-4 h-4"[cite: 2]></i></button>
+            </div>
+            <form onsubmit="submitMember(event)" class="space-y-4"[cite: 2]>
+                <input type="text" id="mem-name" required placeholder="Nome do amigo" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                <button type="submit" class="w-full bg-[#0066FF] text-white font-bold py-2.5 rounded-xl text-xs"[cite: 2]>Adicionar Membro</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NEW GROUP SPLIT -->
+    <div id="modal-add-group-split" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"[cite: 2]>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4"[cite: 2]>
+            <div class="flex items-center justify-between pb-3 border-b border-[#CED4DA]"[cite: 2]>
+                <h3 class="font-bold text-lg text-[#212529]"[cite: 2]>Nova Divisão de Conta em Grupo</h3>
+                <button onclick="closeModal('modal-add-group-split')" class="p-1"[cite: 2]><i data-lucide="x" class="w-5 h-5"[cite: 2]></i></button>
+            </div>
+            <form onsubmit="submitGroupSplit(event)" class="space-y-4"[cite: 2]>
+                <div>
+                    <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Título da Despesa Compartilhada</label>
+                    <input type="text" id="gs-title" required placeholder="Ex: Jantar em Família" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                </div>
+                <div class="grid grid-cols-2 gap-3"[cite: 2]>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Valor Total (R$)</label>
+                        <input type="number" id="gs-amount" step="0.01" required placeholder="0.00" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-4 py-2.5 text-sm"[cite: 2]>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#6C757D] uppercase mb-1"[cite: 2]>Quem Pagou?</label>
+                        <select id="gs-payer" class="w-full bg-transparent border border-[#CED4DA] rounded-xl px-3 py-2.5 text-sm"[cite: 2]>
+                            <option value="Lucas Silva"[cite: 2]>Lucas Silva</option>
+                            <option value="Mariana Costa"[cite: 2]>Mariana Costa</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#FF7A00] text-white font-bold py-3 rounded-xl text-sm shadow"[cite: 2]>Registrar Divisão</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        // Marketplace listings (Airbnb + CVC hybrid)
+        let listings = [
+            {
+                id: 1,
+                title: "Loft Luxuoso com Vista para a Sagrada Família",
+                location: "Barcelona, Espanha",
+                category: "hospedagem",
+                type: "Airbnb Superhost",
+                price: 750,
+                rating: 4.95,
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
+                description: "Desfrute de Barcelona neste apartamento recém-reformado bem ao lado da obra-praça mais famosa da cidade. Wi-Fi ultrarrápido, cozinha completa e varanda privativa.",
+                amenities: ["Wi-Fi", "Cozinha", "Ar-condicionado", "Varanda com vista"]
+            },
+            {
+                id: 2,
+                title: "Pacote Completo CVC: 7 Dias em Paris com Aéreo + Hotel",
+                location: "Paris, França",
+                category: "pacote",
+                type: "CVC Oferta Exclusiva",
+                price: 4890,
+                rating: 4.88,
+                image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
+                description: "Inclui passagens aéreas ida e volta voando Air France + 6 noites de hotel 4 estrelas com café da manhã incluso e transfer aeroporto.",
+                amenities: ["Voo Incluso", "Hotel 4*", "Café da manhã", "Transfer"]
+            },
+            {
+                id: 3,
+                title: "Resort All Inclusive Beira da Praia em Búzios",
+                location: "Rio de Janeiro, Brasil",
+                category: "resort",
+                type: "Resort & Spa",
+                price: 1200,
+                rating: 4.92,
+                image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
+                description: "Tudo incluso: bebidas, refeições gourmet, piscinas de borda infinita e acesso direto à Praia de Geribá.",
+                amenities: ["All Inclusive", "Praia Privativa", "Spa", "Piscina"]
+            },
+            {
+                id: 4,
+                title: "Excursão Guiada Museu do Louvre + Torre Eiffel",
+                location: "Paris, França",
+                category: "passeio",
+                type: "Experiência Rota Certa",
+                price: 320,
+                rating: 4.98,
+                image: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=800&q=80",
+                description: "Pule todas as filas com guia especializado em arte e história. Ingresso prioritário garantido.",
+                amenities: ["Guia VIP", "Ingresso Sem Fila", "Traslado"]
+            },
+            {
+                id: 5,
+                title: "Chalé Alpino Romântico na Serra",
+                location: "Campos do Jordão, Brasil",
+                category: "hospedagem",
+                type: "Airbnb Favorito dos Hóspedes",
+                price: 540,
+                rating: 4.91,
+                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+                description: "Lareira aconchegante, banheira de hidromassagem com vista para a montanha e café da manhã colonial.",
+                amenities: ["Lareira", "Hidromassagem", "Café Colonial"]
+            },
+            {
+                id: 6,
+                title: "Grand Tour Europa: Roma, Florença & Veneza",
+                location: "Itália",
+                category: "europa",
+                type: "Pacote CVC Multi-Cidades",
+                price: 6490,
+                rating: 4.94,
+                image: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=800&q=80",
+                description: "Conheça a Itália com trens de alta velocidade inclusos, hotéis centrais e passeios guiados.",
+                amenities: ["Trens Inclusos", "Hotéis 4*", "Guias Turísticos"]
+            }
+        ];
+
+        let expensesList = [
+            { id: 101, title: "Passagens Aéreas", amount: 2800.00, category: "Transporte", payer: "Lucas Silva" },
+            { id: 102, title: "Hospedagem Barcelona", amount: 1500.00, category: "Hospedagem", payer: "Lucas Silva" }
+        ];
+
+        let itineraryList = [
+            { id: 201, day: 1, title: "Check-in e Caminhada pelo Centro", time: "14:00", location: "Centro Histórico", cost: 0 }
+        ];
+
+        let membersList = [
+            { id: 1, name: "Lucas Silva (Você)", paid: 4300.00 },
+            { id: 2, name: "Mariana Costa", paid: 1200.00 }
+        ];
+
+        let myBookings = [];
+        let activeCategory = 'all';
+        let selectedListingForCheckout = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            renderListings(listings);
+            renderAdvancedSearchGrid(listings);
+            renderPlannerAll();
+            renderMyTrips();
+        });
+
+        function switchView(viewName) {
+            ['view-explore', 'view-search', 'view-details', 'view-planner', 'view-my-trips', 'view-profile'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            if (viewName === 'search') {
+                triggerAdvancedSearch();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function triggerAdvancedSearch() {
+            const query = (document.getElementById('advanced-query')?.value || '').toLowerCase();
+            const category = document.getElementById('advanced-category')?.value || 'all';
+            const maxPrice = parseFloat(document.getElementById('advanced-price')?.value || 10000);
+            const sortMode = document.getElementById('advanced-sort')?.value || 'recommended';
+
+            if (document.getElementById('price-val-label')) {
+                document.getElementById('price-val-label').innerText = `R$ ${maxPrice.toLocaleString('pt-BR')}`;
+            }
+
+            let results = listings.filter(item => {
+                const matchQuery = item.title.toLowerCase().includes(query) || item.location.toLowerCase().includes(query);
+                const matchCategory = category === 'all' || item.category === category;
+                const matchPrice = item.price <= maxPrice;
+                return matchQuery && matchCategory && matchPrice;
+            });
+
+            if (sortMode === 'price-asc') results.sort((a, b) => a.price - b.price);
+            if (sortMode === 'price-desc') results.sort((a, b) => b.price - a.price);
+            if (sortMode === 'rating') results.sort((a, b) => b.rating - a.rating);
+
+            renderAdvancedSearchGrid(results);
+        }
+
+        function renderAdvancedSearchGrid(data) {
+            const grid = document.getElementById('advanced-search-grid');
+            const countLabel = document.getElementById('search-results-count');
+            if (!grid) return;
+
+            if (countLabel) countLabel.innerText = `Exibindo ${data.length} opções correspondentes`;
+
+            if (data.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-12 bg-white rounded-2xl border border-[#CED4DA] text-xs text-[#6C757D]">Nenhum item encontrado com esses filtros. Tente ampliar sua busca!</div>`;
+                return;
+            }
+
+            grid.innerHTML = data.map(item => `
+                <div onclick="viewListingDetails(${item.id})" class="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-[#CED4DA] hover:shadow-xl transition flex flex-col">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-[#E9ECEF]">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#212529] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">${item.type}</span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1 justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-sm text-[#212529] truncate">${item.title}</h3>
+                                <span class="flex items-center text-xs font-bold gap-1"><i data-lucide="star" class="w-3.5 h-3.5 fill-[#212529] text-[#212529]"></i> ${item.rating}</span>
+                            </div>
+                            <p class="text-xs text-[#6C757D] mt-1">${item.location}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-[#CED4DA] flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-[#6C757D] uppercase">Preço</span>
+                                <p class="text-base font-extrabold text-[#212529]">R$ ${item.price.toLocaleString('pt-BR')}</p>
+                            </div>
+                            <span class="bg-[#FF7A00] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow">Ver</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function resetSearchFilters() {
+            document.getElementById('advanced-query').value = '';
+            document.getElementById('advanced-category').value = 'all';
+            document.getElementById('advanced-price').value = 10000;
+            document.getElementById('advanced-sort').value = 'recommended';
+            triggerAdvancedSearch();
+            showToast('Filtros redefinidos!', 'info');
+        }
+
+        function switchPlannerTab(tabName) {
+            ['overview', 'itinerary', 'expenses', 'groups'].forEach(t => {
+                document.getElementById(`ptab-${t}`).classList.add('hidden');
+                document.getElementById(`pnav-${t}`).className = "planner-nav pb-3 text-sm font-medium text-[#6C757D] hover:text-[#212529] whitespace-nowrap";
+            });
+            document.getElementById(`ptab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`pnav-${tabName}`).className = "planner-nav pb-3 text-sm font-bold border-b-2 border-[#0066FF] text-[#0066FF] whitespace-nowrap";
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = "category-btn flex flex-col items-center gap-1 min-w-max text-[#6C757D] hover:text-[#212529] pb-2 font-medium text-xs transition";
+            });
+            event.currentTarget.className = "category-btn flex flex-col items-center gap-1 min-w-max text-[#0066FF] border-b-2 border-[#0066FF] pb-2 font-semibold text-xs transition";
+
+            if (cat === 'all') {
+                renderListings(listings);
+            } else {
+                renderListings(listings.filter(item => item.category === cat));
+            }
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-destination').value.toLowerCase();
+            const filtered = listings.filter(item => item.title.toLowerCase().includes(query) || item.location.toLowerCase().includes(query));
+            renderListings(filtered);
+            showToast(`Busca realizada com ${filtered.length} resultados!`, 'success');
+        }
+
+        function renderListings(data) {
+            const grid = document.getElementById('listings-grid');
+            const countBadge = document.getElementById('listings-count');
+            if (!grid) return;
+
+            countBadge.innerText = `Mostrando ${data.length} opções`;
+
+            if (data.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-12 text-[#6C757D]">Nenhum resultado encontrado.</div>`;
+                return;
+            }
+
+            grid.innerHTML = data.map(item => `
+                <div onclick="viewListingDetails(${item.id})" class="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-[#CED4DA] hover:shadow-xl transition flex flex-col">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-[#E9ECEF]">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#212529] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">${item.type}</span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1 justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-sm text-[#212529] truncate">${item.title}</h3>
+                                <span class="flex items-center text-xs font-bold gap-1"><i data-lucide="star" class="w-3.5 h-3.5 fill-[#212529] text-[#212529]"></i> ${item.rating}</span>
+                            </div>
+                            <p class="text-xs text-[#6C757D] mt-1">${item.location}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-[#CED4DA] flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-[#6C757D] uppercase">A partir de</span>
+                                <p class="text-base font-extrabold text-[#212529]">R$ ${item.price.toLocaleString('pt-BR')} <span class="text-xs font-normal text-[#6C757D]">/ diária</span></p>
+                            </div>
+                            <span class="bg-[#FF7A00] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow">Ver Detalhes</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function viewListingDetails(id) {
+            const item = listings.find(l => l.id === id);
+            if (!item) return;
+            selectedListingForCheckout = item;
+
+            const container = document.getElementById('details-content');
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div>
+                            <span class="bg-[#0066FF]/10 text-[#0066FF] text-xs font-bold px-3 py-1 rounded-full">${item.type}</span>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#212529] mt-2">${item.title}</h1>
+                            <p class="text-sm text-[#6C757D] mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4 text-[#FF7A00]"></i> ${item.location} • ⭐ ${item.rating}</p>
+                        </div>
+
+                        <div class="rounded-3xl overflow-hidden aspect-[16/9] shadow-lg">
+                            <img src="${item.image}" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-[#CED4DA] shadow-sm">
+                            <h3 class="font-bold text-base text-[#212529] mb-2">Sobre esta estadia / pacote</h3>
+                            <p class="text-sm text-[#6C757D] leading-relaxed">${item.description}</p>
+                            
+                            <div class="mt-4 pt-4 border-t border-[#CED4DA]">
+                                <h4 class="text-xs font-bold uppercase text-[#6C757D] mb-2">O que está incluso:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${item.amenities.map(a => `<span class="bg-[#F8F9FA] px-3 py-1.5 rounded-xl border border-[#CED4DA] text-xs font-semibold text-[#212529]">${a}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="bg-white p-6 rounded-3xl border border-[#CED4DA] shadow-xl space-y-4 sticky top-28">
+                            <div class="flex items-baseline justify-between">
+                                <span class="text-2xl font-extrabold text-[#212529]">R$ ${item.price.toLocaleString('pt-BR')}</span>
+                                <span class="text-xs text-[#6C757D]">/ total ou pessoa</span>
+                            </div>
+                            <button onclick="openCheckoutModal()" class="w-full bg-[#FF7A00] hover:bg-[#e06c00] text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Reservar Agora
+                            </button>
+                            <button onclick="addToPlannerFromDetails('${item.title}', ${item.price})" class="w-full bg-[#F8F9FA] hover:bg-[#E9ECEF] text-[#212529] font-bold py-3 rounded-xl transition text-xs flex items-center justify-center gap-2 border border-[#CED4DA]">
+                                <i data-lucide="calendar-plus" class="w-4 h-4 text-[#0066FF]"></i> Adicionar ao Planner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            switchView('details');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openCheckoutModal() {
+            if (!selectedListingForCheckout) return;
+            const details = document.getElementById('checkout-item-details');
+            details.innerHTML = `
+                <div class="flex items-center gap-3 bg-[#F8F9FA] p-3 rounded-2xl border border-[#CED4DA]">
+                    <img src="${selectedListingForCheckout.image}" class="w-16 h-16 rounded-xl object-cover">
+                    <div>
+                        <h4 class="font-bold text-xs text-[#212529]">${selectedListingForCheckout.title}</h4>
+                        <p class="text-xs font-bold text-[#FF7A00] mt-0.5">R$ ${selectedListingForCheckout.price.toLocaleString('pt-BR')}</p>
+                    </div>
+                </div>
+            `;
+            openModal('modal-checkout');
+        }
+
+        function submitReservation(e) {
+            e.preventDefault();
+            myBookings.push({
+                id: Date.now(),
+                title: selectedListingForCheckout.title,
+                price: selectedListingForCheckout.price,
+                image: selectedListingForCheckout.image,
+                location: selectedListingForCheckout.location,
+                date: document.getElementById('checkout-date-in').value || '2026-06-01'
+            });
+
+            closeModal('modal-checkout');
+            showToast('Reserva confirmada com sucesso! Verifique em "Minhas Viagens".', 'success');
+            renderMyTrips();
+            switchView('my-trips');
+        }
+
+        function renderMyTrips() {
+            const container = document.getElementById('my-trips-container');
+            if (!container) return;
+
+            document.getElementById('stat-trips-count').innerText = `${myBookings.length + 2}`;
+
+            if (myBookings.length === 0) {
+                container.innerHTML = `<div class="p-8 bg-white rounded-2xl border border-[#CED4DA] text-center text-xs text-[#6C757D]">Você ainda não possui reservas confirmadas. Explore e reserve sua próxima aventura!</div>`;
+                return;
+            }
+
+            container.innerHTML = myBookings.map(b => `
+                <div class="bg-white p-5 rounded-2xl border border-[#CED4DA] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <img src="${b.image}" class="w-20 h-20 rounded-2xl object-cover">
+                        <div>
+                            <span class="bg-[#28A745]/10 text-[#28A745] text-[10px] font-bold px-2.5 py-0.5 rounded-full">Reserva Confirmada ✅</span>
+                            <h4 class="font-bold text-base text-[#212529] mt-1">${b.title}</h4>
+                            <p class="text-xs text-[#6C757D]">${b.location} • Data: ${b.date}</p>
+                        </div>
+                    </div>
+                    <span class="font-extrabold text-base text-[#212529]">R$ ${b.price.toLocaleString('pt-BR')}</span>
+                </div>
+            `).join('');
+        }
+
+        function addToPlannerFromDetails(title, price) {
+            expensesList.push({
+                id: Date.now(),
+                title: title,
+                amount: price,
+                category: "Hospedagem",
+                payer: "Lucas Silva"
+            });
+            renderPlannerAll();
+            showToast('Adicionado ao seu Planner de Viagem!', 'success');
+            switchView('planner');
+        }
+
+        function renderPlannerAll() {
+            const totalExp = expensesList.reduce((acc, curr) => acc + curr.amount, 0);
+            document.getElementById('planner-stat-expenses').innerText = `R$ ${totalExp.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('planner-stat-activities').innerText = `${itineraryList.length} Itens`;
+            document.getElementById('planner-stat-members').innerText = `${membersList.length} Membros`;
+            document.getElementById('stat-members-count').innerText = `${membersList.length}`;
+            document.getElementById('expenses-count-badge').innerText = `${expensesList.length} registros`;
+
+            // Expenses list
+            const expContainer = document.getElementById('expenses-list-container');
+            expContainer.innerHTML = expensesList.map(e => `
+                <div class="p-4 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-xs text-[#212529]">${e.title}</h4>
+                        <span class="text-[10px] text-[#6C757D]">Pago por ${e.payer} • ${e.category}</span>
+                    </div>
+                    <span class="font-bold text-sm">R$ ${e.amount.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            // Itinerary list
+            const itContainer = document.getElementById('itinerary-container');
+            itContainer.innerHTML = itineraryList.map(i => `
+                <div class="bg-white p-4 rounded-2xl border border-[#CED4DA] flex justify-between items-center shadow-sm">
+                    <div>
+                        <h4 class="font-bold text-xs text-[#212529]">${i.title}</h4>
+                        <p class="text-[10px] text-[#6C757D]">${i.time} - ${i.location}</p>
+                    </div>
+                    <span class="font-bold text-xs text-[#28A745]">R$ ${i.cost.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            // Members list
+            const memContainer = document.getElementById('members-list-container');
+            memContainer.innerHTML = membersList.map(m => `
+                <div class="p-3 bg-[#F8F9FA] border border-[#CED4DA] rounded-xl flex justify-between items-center text-xs font-bold">
+                    <span>${m.name}</span>
+                    <span class="text-[#0066FF]">R$ ${m.paid.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            // Splits
+            const share = totalExp / (membersList.length || 1);
+            const splitsContainer = document.getElementById('splits-list-container');
+            splitsContainer.innerHTML = `
+                <div class="p-3 bg-[#0066FF]/10 rounded-xl text-xs font-bold text-[#0066FF] mb-2 border border-[#0066FF]/20">
+                    Cota Justa por Pessoa: R$ ${share.toFixed(2)}
+                </div>
+            ` + membersList.map(m => `
+                <div class="p-3 bg-[#F8F9FA] border border-[#CED4DA] rounded-xl flex justify-between items-center text-xs">
+                    <span class="font-bold">${m.name}</span>
+                    <span class="font-bold ${m.paid >= share ? 'text-success' : 'text-danger'}">${m.paid >= share ? 'Crédito' : 'Deve'} R$ ${Math.abs(m.paid - share).toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function submitExpense(e) {
+            e.preventDefault();
+            expensesList.push({
+                id: Date.now(),
+                title: document.getElementById('exp-title').value,
+                amount: parseFloat(document.getElementById('exp-amount').value),
+                category: document.getElementById('exp-cat').value,
+                payer: "Lucas Silva"
+            });
+            closeModal('modal-add-expense-general');
+            e.target.reset();
+            renderPlannerAll();
+            showToast('Gasto salvo no Planner!', 'success');
+        }
+
+        function submitItinerary(e) {
+            e.preventDefault();
+            itineraryList.push({
+                id: Date.now(),
+                title: document.getElementById('it-title').value,
+                day: parseInt(document.getElementById('it-day').value),
+                time: document.getElementById('it-time').value,
+                location: document.getElementById('it-loc').value,
+                cost: parseFloat(document.getElementById('it-cost').value) || 0
+            });
+            closeModal('modal-add-itinerary');
+            e.target.reset();
+            renderPlannerAll();
+            showToast('Atividade adicionada!', 'success');
+        }
+
+        function submitMember(e) {
+            e.preventDefault();
+            membersList.push({
+                id: Date.now(),
+                name: document.getElementById('mem-name').value,
+                paid: 0
+            });
+            closeModal('modal-add-member');
+            e.target.reset();
+            renderPlannerAll();
+            showToast('Membro adicionado!', 'success');
+        }
+
+        function submitGroupSplit(e) {
+            e.preventDefault();
+            const title = document.getElementById('gs-title').value;
+            const amount = parseFloat(document.getElementById('gs-amount').value);
+            const payer = document.getElementById('gs-payer').value;
+
+            expensesList.push({ id: Date.now(), title, amount, category: 'Lazer', payer });
+            const mem = membersList.find(m => m.name.includes(payer));
+            if (mem) mem.paid += amount;
+
+            closeModal('modal-add-group-split');
+            e.target.reset();
+            renderPlannerAll();
+            showToast('Nova divisão de conta registrada com sucesso!', 'success');
+        }
+
+        function handleAuthLogin(e) {
+            e.preventDefault();
+            closeModal('modal-auth');
+            showToast('Login efetuado com sucesso! Bem-vindo de volta.', 'success');
+        }
+
+        function submitEditProfile(e) {
+            e.preventDefault();
+            const name = document.getElementById('edit-name').value;
+            const email = document.getElementById('edit-email').value;
+            const phone = document.getElementById('edit-phone').value;
+
+            document.getElementById('profile-display-name').innerText = name;
+            document.getElementById('profile-display-email').innerText = `${email} • São Paulo, SP`;
+            document.getElementById('profile-display-phone').innerText = phone;
+            
+            const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            document.getElementById('profile-avatar-box').innerText = initials;
+            document.getElementById('header-user-avatar').innerText = initials;
+
+            closeModal('modal-edit-profile');
+            showToast('Perfil atualizado com sucesso!', 'success');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `bg-[#212529] text-white px-4 py-3 rounded-xl shadow-xl text-xs font-bold pointer-events-auto toast-animate flex items-center gap-2 border border-[#CED4DA]`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
